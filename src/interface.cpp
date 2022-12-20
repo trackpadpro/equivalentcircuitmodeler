@@ -8,8 +8,8 @@ int main(){
     std::shared_ptr<Resistor> R_CT = std::make_shared<Resistor>(5);
     std::shared_ptr<Capacitor> C = std::make_shared<Capacitor>(0.0005);
 
-    Circuit A({{C}});
-    Circuit B({{R_S},{R_CT,std::make_shared<Circuit>(A)}});
+    Circuit A({{R_CT},{std::make_shared<Warburg>(2)}});
+    Circuit B({{R_S},{std::make_shared<Circuit>(A),C}});
 
     {
         std::ofstream outCSV("./data/nyquist.csv");

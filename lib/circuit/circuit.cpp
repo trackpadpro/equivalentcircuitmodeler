@@ -1,5 +1,7 @@
 #include "circuit.h"
 
+const std::complex<double> j(0.0,1.0);
+
 std::complex<double> Impedance::simplify(const double& freq){
     return Z;
 }
@@ -21,18 +23,20 @@ std::complex<double> Circuit::simplify(const double& freq){
     return Z;
 }
 
-std::complex<double> Resistor::simplify(const double& freq){
-    return Z;
-}
-
 std::complex<double> Inductor::simplify(const double& freq){
-    Z = std::polar(freq*L,std::numbers::pi*0.5);
+    Z = j*freq*L;
 
     return Z;
 }
 
 std::complex<double> Capacitor::simplify(const double& freq){
-    Z = std::polar(1.0/(freq*C),-std::numbers::pi*0.5);
+    Z = 1.0/(j*freq*C);
+
+    return Z;
+}
+
+std::complex<double> Warburg::simplify(const double& freq){
+    Z = (A-j*A)/sqrt(freq); //General eqn
 
     return Z;
 }
@@ -47,7 +51,7 @@ std::map<double,std::complex<double>> Impedance::sweep(const double& freqMin,con
     return Zsweep;
 }
 
-std::map<double,double> bode(std::map<double,std::complex<double>> sweep){
+std::map<double,double> bode(const std::map<double,std::complex<double>>& sweep){
     std::map<double,double> bod;
 
     for(const auto& [freq,Z]: sweep){
@@ -57,7 +61,7 @@ std::map<double,double> bode(std::map<double,std::complex<double>> sweep){
     return bod;
 }
 
-std::map<double,double> nyquist(std::map<double,std::complex<double>> sweep){
+std::map<double,double> nyquist(const std::map<double,std::complex<double>>& sweep){
     std::map<double,double> nyq;
 
     for(const auto& [freq,Z]: sweep){
@@ -67,19 +71,23 @@ std::map<double,double> nyquist(std::map<double,std::complex<double>> sweep){
     return nyq;
 }
 
-Circuit::Circuit(std::vector<std::vector<std::shared_ptr<Impedance>>> circuit){
+Circuit::Circuit(const std::vector<std::vector<std::shared_ptr<Impedance>>>& circuit){
     components = circuit;
 }
 
-Resistor::Resistor(double ohm){
+Resistor::Resistor(const double& ohm){
     R = ohm;
     Z = ohm;
 }
 
-Inductor::Inductor(double henry){
+Inductor::Inductor(const double& henry){
     L = henry;
 }
 
-Capacitor::Capacitor(double coulomb){
+Capacitor::Capacitor(const double& coulomb){
     C = coulomb;
+}
+
+Warburg::Warburg(const double& A_W){
+    A = A_W;
 }

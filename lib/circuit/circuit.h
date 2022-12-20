@@ -1,7 +1,6 @@
 #if !defined(CIRCUIT_H)
 #define CIRCUIT_H
 
-#include <numbers>
 #include <complex>
 #include <memory>
 #include <vector>
@@ -18,26 +17,25 @@ class Impedance{
 
 class Circuit: public Impedance{
     public:
-        Circuit(std::vector<std::vector<std::shared_ptr<Impedance>>> circuit);
+        Circuit(const std::vector<std::vector<std::shared_ptr<Impedance>>>& circuit);
         std::complex<double> simplify(const double& freq);
     private:
         std::vector<std::vector<std::shared_ptr<Impedance>>> components;
 };
 
-std::map<double,double> bode(std::map<double,std::complex<double>> sweep);  //freq in rad/s, mag in dB
-std::map<double,double> nyquist(std::map<double,std::complex<double>> sweep);
+std::map<double,double> bode(const std::map<double,std::complex<double>>& sweep);  //freq in rad/s, mag in dB
+std::map<double,double> nyquist(const std::map<double,std::complex<double>>& sweep);
 
 class Resistor: public Impedance{
     public:
-        Resistor(double ohm);
-        std::complex<double> simplify(const double& freq);
+        Resistor(const double& ohm);
     private:
         double R;
 };
 
 class Inductor: public Impedance{
     public:
-        Inductor(double henry);
+        Inductor(const double& henry);
         std::complex<double> simplify(const double& freq);
     private:
         double L;
@@ -45,10 +43,18 @@ class Inductor: public Impedance{
 
 class Capacitor: public Impedance{
     public:
-        Capacitor(double coulomb);
+        Capacitor(const double& coulomb);
         std::complex<double> simplify(const double& freq);
     private:
         double C;
+};
+
+class Warburg: public Impedance{
+    public:
+        Warburg(const double& A_W);
+        std::complex<double> simplify(const double& freq);
+    private:
+        double A;
 };
 
 #endif
